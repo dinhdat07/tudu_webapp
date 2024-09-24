@@ -1,0 +1,4 @@
+org.springframework.test.context.ContextCustomizerFactory = me.tudu.config.\
+    SqlTestContainersSpringContextCustomizerFactory,me.tudu.config.\
+    TestContainersSpringContextCustomizerFactory,me.tudu.config.\
+    RedisTestContainersSpringContextCustomizerFactory
