@@ -1,0 +1,28 @@
+{
+  "tuduApp": {
+    "userTasks": {
+      "home": {
+        "title": "User Tasks",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new User Tasks",
+        "createOrEditLabel": "Create or edit a User Tasks",
+        "search": "Search for User Tasks",
+        "notFound": "No User Tasks found"
+      },
+      "created": "A new User Tasks is created with identifier {{ param }}",
+      "updated": "A User Tasks is updated with identifier {{ param }}",
+      "deleted": "A User Tasks is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete User Tasks {{ id }}?"
+      },
+      "detail": {
+        "title": "User Tasks"
+      },
+      "id": "ID",
+      "privilege": "Privilege",
+      "createdAt": "Created At",
+      "user": "User",
+      "task": "Task"
+    }
+  }
+}

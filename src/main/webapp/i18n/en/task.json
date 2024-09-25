@@ -1,0 +1,33 @@
+{
+  "tuduApp": {
+    "task": {
+      "home": {
+        "title": "Tasks",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Task",
+        "createOrEditLabel": "Create or edit a Task",
+        "search": "Search for Task",
+        "notFound": "No Tasks found"
+      },
+      "created": "A new Task is created with identifier {{ param }}",
+      "updated": "A Task is updated with identifier {{ param }}",
+      "deleted": "A Task is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Task {{ id }}?"
+      },
+      "detail": {
+        "title": "Task"
+      },
+      "id": "ID",
+      "title": "Title",
+      "description": "Description",
+      "dueDate": "Due Date",
+      "priority": "Priority",
+      "status": "Status",
+      "category": "Category",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "workspace": "Workspace"
+    }
+  }
+}

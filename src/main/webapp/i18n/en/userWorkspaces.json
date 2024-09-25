@@ -1,0 +1,28 @@
+{
+  "tuduApp": {
+    "userWorkspaces": {
+      "home": {
+        "title": "User Workspaces",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new User Workspaces",
+        "createOrEditLabel": "Create or edit a User Workspaces",
+        "search": "Search for User Workspaces",
+        "notFound": "No User Workspaces found"
+      },
+      "created": "A new User Workspaces is created with identifier {{ param }}",
+      "updated": "A User Workspaces is updated with identifier {{ param }}",
+      "deleted": "A User Workspaces is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete User Workspaces {{ id }}?"
+      },
+      "detail": {
+        "title": "User Workspaces"
+      },
+      "id": "ID",
+      "privilege": "Privilege",
+      "createdAt": "Created At",
+      "user": "User",
+      "workspace": "Workspace"
+    }
+  }
+}

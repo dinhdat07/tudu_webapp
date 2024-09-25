@@ -1,0 +1,29 @@
+{
+  "annotations": {
+    "changelogDate": "20240924130320"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "createdAt",
+      "fieldType": "Instant"
+    }
+  ],
+  "name": "WorkspaceTasks",
+  "relationships": [
+    {
+      "otherEntityName": "workspace",
+      "relationshipName": "workspace",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "task",
+      "relationshipName": "task",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "serviceClass"
+}

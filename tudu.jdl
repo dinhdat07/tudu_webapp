@@ -1,0 +1,47 @@
+entity Task {
+  title String required
+  description String
+  dueDate Instant
+  priority String
+  status String
+  category String
+  createdAt Instant
+  updatedAt Instant
+}
+
+entity Workspace {
+  name String required
+  description String
+  createdAt Instant
+  updatedAt Instant
+}
+
+entity Notification {
+  message String required
+  status String
+  createdAt Instant
+}
+
+entity UserTasks {
+  privilege String
+  createdAt Instant
+}
+
+entity UserWorkspaces {
+  privilege String
+  createdAt Instant
+}
+
+relationship ManyToOne {
+  UserTasks{user(id)} to User with builtInEntity
+  UserTasks{task(id)} to Task
+  UserWorkspaces{user(id)} to User with builtInEntity
+  UserWorkspaces{workspace(id)} to Workspace
+  Notification{user(id)} to User with builtInEntity
+  Task{workspace(id)} to Workspace
+}
+
+// Define the service and DTO options
+service all with serviceClass
+dto all with mapstruct
+paginate all with pagination
