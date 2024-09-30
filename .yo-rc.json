@@ -16,7 +16,7 @@
     "enableHibernateCache": true,
     "enableSwaggerCodegen": false,
     "enableTranslation": true,
-    "entities": ["Notification", "Task", "UserTasks", "UserWorkspaces", "Workspace", "WorkspaceTasks"],
+    "entities": ["Notification", "Task", "Workspace", "WorkspaceTasks"],
     "feignClient": null,
     "jhipsterVersion": "8.7.1",
     "jwtSecretKey": "ZTA0MmMwYWZmMzRkZTBhZWJlYTE3MTZmYzUwYzMxOGQ1MDdiMTMxOGFhOGQ1NWRmZWU2MzkyYzQxMTg4NjQyZDk5ZDk1NzliY2UyODUzYTBhZmEzODI4YWJmYmQ0MTA5ZDU3NTNkNjBkZTkyZWQ3Yzg5ODcwYWY2MTA3YmUyYWI=",

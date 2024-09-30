@@ -3,7 +3,10 @@ package me.tudu.service.dto;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
+import me.tudu.domain.enumeration.Privilege;
 
 /**
  * A DTO for the {@link me.tudu.domain.Workspace} entity.
@@ -21,6 +24,10 @@ public class WorkspaceDTO implements Serializable {
     private Instant createdAt;
 
     private Instant updatedAt;
+
+    private Privilege privilege;
+
+    private Set<UserDTO> users = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -62,6 +69,22 @@ public class WorkspaceDTO implements Serializable {
         this.updatedAt = updatedAt;
     }
 
+    public Privilege getPrivilege() {
+        return privilege;
+    }
+
+    public void setPrivilege(Privilege privilege) {
+        this.privilege = privilege;
+    }
+
+    public Set<UserDTO> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Set<UserDTO> users) {
+        this.users = users;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -92,6 +115,8 @@ public class WorkspaceDTO implements Serializable {
             ", description='" + getDescription() + "'" +
             ", createdAt='" + getCreatedAt() + "'" +
             ", updatedAt='" + getUpdatedAt() + "'" +
+            ", privilege='" + getPrivilege() + "'" +
+            ", users=" + getUsers() +
             "}";
     }
 }

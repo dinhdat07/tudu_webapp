@@ -12,12 +12,6 @@ const EntitiesMenu = () => {
       <MenuItem icon="asterisk" to="/task">
         <Translate contentKey="global.menu.entities.task" />
       </MenuItem>
-      <MenuItem icon="asterisk" to="/user-tasks">
-        <Translate contentKey="global.menu.entities.userTasks" />
-      </MenuItem>
-      <MenuItem icon="asterisk" to="/user-workspaces">
-        <Translate contentKey="global.menu.entities.userWorkspaces" />
-      </MenuItem>
       <MenuItem icon="asterisk" to="/workspace">
         <Translate contentKey="global.menu.entities.workspace" />
       </MenuItem>

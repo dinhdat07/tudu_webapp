@@ -12,7 +12,8 @@
     },
     {
       "fieldName": "status",
-      "fieldType": "String"
+      "fieldType": "Status",
+      "fieldValues": "PENDING,IN_PROGRESS,COMPLETED"
     },
     {
       "fieldName": "createdAt",

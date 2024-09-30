@@ -13,22 +13,31 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import me.tudu.IntegrationTest;
 import me.tudu.domain.Workspace;
+import me.tudu.domain.enumeration.Privilege;
+import me.tudu.repository.UserRepository;
 import me.tudu.repository.WorkspaceRepository;
 import me.tudu.repository.search.WorkspaceSearchRepository;
+import me.tudu.service.WorkspaceService;
 import me.tudu.service.dto.WorkspaceDTO;
 import me.tudu.service.mapper.WorkspaceMapper;
 import org.assertj.core.util.IterableUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Streamable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -39,6 +48,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Integration tests for the {@link WorkspaceResource} REST controller.
  */
 @IntegrationTest
+@ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 @WithMockUser
 class WorkspaceResourceIT {
@@ -55,6 +65,9 @@ class WorkspaceResourceIT {
     private static final Instant DEFAULT_UPDATED_AT = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_UPDATED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
+    private static final Privilege DEFAULT_PRIVILEGE = Privilege.VIEW;
+    private static final Privilege UPDATED_PRIVILEGE = Privilege.EDIT;
+
     private static final String ENTITY_API_URL = "/api/workspaces";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
     private static final String ENTITY_SEARCH_API_URL = "/api/workspaces/_search";
@@ -69,7 +82,16 @@ class WorkspaceResourceIT {
     private WorkspaceRepository workspaceRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Mock
+    private WorkspaceRepository workspaceRepositoryMock;
+
+    @Autowired
     private WorkspaceMapper workspaceMapper;
+
+    @Mock
+    private WorkspaceService workspaceServiceMock;
 
     @Autowired
     private WorkspaceSearchRepository workspaceSearchRepository;
@@ -95,7 +117,8 @@ class WorkspaceResourceIT {
             .name(DEFAULT_NAME)
             .description(DEFAULT_DESCRIPTION)
             .createdAt(DEFAULT_CREATED_AT)
-            .updatedAt(DEFAULT_UPDATED_AT);
+            .updatedAt(DEFAULT_UPDATED_AT)
+            .privilege(DEFAULT_PRIVILEGE);
     }
 
     /**
@@ -109,7 +132,8 @@ class WorkspaceResourceIT {
             .name(UPDATED_NAME)
             .description(UPDATED_DESCRIPTION)
             .createdAt(UPDATED_CREATED_AT)
-            .updatedAt(UPDATED_UPDATED_AT);
+            .updatedAt(UPDATED_UPDATED_AT)
+            .privilege(UPDATED_PRIVILEGE);
     }
 
     @BeforeEach
@@ -215,7 +239,25 @@ class WorkspaceResourceIT {
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
             .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
-            .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())));
+            .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].privilege").value(hasItem(DEFAULT_PRIVILEGE.toString())));
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    void getAllWorkspacesWithEagerRelationshipsIsEnabled() throws Exception {
+        when(workspaceServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
+
+        restWorkspaceMockMvc.perform(get(ENTITY_API_URL + "?eagerload=true")).andExpect(status().isOk());
+
+        verify(workspaceServiceMock, times(1)).findAllWithEagerRelationships(any());
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    void getAllWorkspacesWithEagerRelationshipsIsNotEnabled() throws Exception {
+        when(workspaceServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
+
+        restWorkspaceMockMvc.perform(get(ENTITY_API_URL + "?eagerload=false")).andExpect(status().isOk());
+        verify(workspaceRepositoryMock, times(1)).findAll(any(Pageable.class));
     }
 
     @Test
@@ -233,7 +275,8 @@ class WorkspaceResourceIT {
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
             .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION))
             .andExpect(jsonPath("$.createdAt").value(DEFAULT_CREATED_AT.toString()))
-            .andExpect(jsonPath("$.updatedAt").value(DEFAULT_UPDATED_AT.toString()));
+            .andExpect(jsonPath("$.updatedAt").value(DEFAULT_UPDATED_AT.toString()))
+            .andExpect(jsonPath("$.privilege").value(DEFAULT_PRIVILEGE.toString()));
     }
 
     @Test
@@ -257,7 +300,12 @@ class WorkspaceResourceIT {
         Workspace updatedWorkspace = workspaceRepository.findById(workspace.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedWorkspace are not directly saved in db
         em.detach(updatedWorkspace);
-        updatedWorkspace.name(UPDATED_NAME).description(UPDATED_DESCRIPTION).createdAt(UPDATED_CREATED_AT).updatedAt(UPDATED_UPDATED_AT);
+        updatedWorkspace
+            .name(UPDATED_NAME)
+            .description(UPDATED_DESCRIPTION)
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT)
+            .privilege(UPDATED_PRIVILEGE);
         WorkspaceDTO workspaceDTO = workspaceMapper.toDto(updatedWorkspace);
 
         restWorkspaceMockMvc
@@ -367,7 +415,11 @@ class WorkspaceResourceIT {
         Workspace partialUpdatedWorkspace = new Workspace();
         partialUpdatedWorkspace.setId(workspace.getId());
 
-        partialUpdatedWorkspace.name(UPDATED_NAME).description(UPDATED_DESCRIPTION).updatedAt(UPDATED_UPDATED_AT);
+        partialUpdatedWorkspace
+            .name(UPDATED_NAME)
+            .description(UPDATED_DESCRIPTION)
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT);
 
         restWorkspaceMockMvc
             .perform(
@@ -402,7 +454,8 @@ class WorkspaceResourceIT {
             .name(UPDATED_NAME)
             .description(UPDATED_DESCRIPTION)
             .createdAt(UPDATED_CREATED_AT)
-            .updatedAt(UPDATED_UPDATED_AT);
+            .updatedAt(UPDATED_UPDATED_AT)
+            .privilege(UPDATED_PRIVILEGE);
 
         restWorkspaceMockMvc
             .perform(
@@ -528,7 +581,8 @@ class WorkspaceResourceIT {
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
             .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
-            .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())));
+            .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].privilege").value(hasItem(DEFAULT_PRIVILEGE.toString())));
     }
 
     protected long getRepositoryCount() {

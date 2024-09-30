@@ -27,7 +27,9 @@
       "category": "Category",
       "createdAt": "Created At",
       "updatedAt": "Updated At",
-      "workspace": "Workspace"
+      "privilege": "Privilege",
+      "workspace": "Workspace",
+      "user": "User"
     }
   }
 }

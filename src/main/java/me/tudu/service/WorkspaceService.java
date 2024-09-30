@@ -103,6 +103,15 @@ public class WorkspaceService {
     }
 
     /**
+     * Get all the workspaces with eager load of many-to-many relationships.
+     *
+     * @return the list of entities.
+     */
+    public Page<WorkspaceDTO> findAllWithEagerRelationships(Pageable pageable) {
+        return workspaceRepository.findAllWithEagerRelationships(pageable).map(workspaceMapper::toDto);
+    }
+
+    /**
      * Get one workspace by id.
      *
      * @param id the id of the entity.
@@ -111,7 +120,7 @@ public class WorkspaceService {
     @Transactional(readOnly = true)
     public Optional<WorkspaceDTO> findOne(Long id) {
         LOG.debug("Request to get Workspace : {}", id);
-        return workspaceRepository.findById(id).map(workspaceMapper::toDto);
+        return workspaceRepository.findOneWithEagerRelationships(id).map(workspaceMapper::toDto);
     }
 
     /**

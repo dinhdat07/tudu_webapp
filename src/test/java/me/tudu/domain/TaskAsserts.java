@@ -54,7 +54,8 @@ public class TaskAsserts {
             .satisfies(e -> assertThat(e.getStatus()).as("check status").isEqualTo(actual.getStatus()))
             .satisfies(e -> assertThat(e.getCategory()).as("check category").isEqualTo(actual.getCategory()))
             .satisfies(e -> assertThat(e.getCreatedAt()).as("check createdAt").isEqualTo(actual.getCreatedAt()))
-            .satisfies(e -> assertThat(e.getUpdatedAt()).as("check updatedAt").isEqualTo(actual.getUpdatedAt()));
+            .satisfies(e -> assertThat(e.getUpdatedAt()).as("check updatedAt").isEqualTo(actual.getUpdatedAt()))
+            .satisfies(e -> assertThat(e.getPrivilege()).as("check privilege").isEqualTo(actual.getPrivilege()));
     }
 
     /**

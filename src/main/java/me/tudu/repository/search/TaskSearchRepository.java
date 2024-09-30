@@ -57,7 +57,7 @@ class TaskSearchRepositoryInternalImpl implements TaskSearchRepositoryInternal {
 
     @Override
     public void index(Task entity) {
-        repository.findById(entity.getId()).ifPresent(elasticsearchTemplate::save);
+        repository.findOneWithEagerRelationships(entity.getId()).ifPresent(elasticsearchTemplate::save);
     }
 
     @Override

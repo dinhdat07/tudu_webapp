@@ -1,0 +1,9 @@
+{
+  "tuduApp": {
+    "Privilege": {
+      "null": "",
+      "VIEW": "VIEW",
+      "EDIT": "EDIT"
+    }
+  }
+}

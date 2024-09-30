@@ -20,11 +20,13 @@
     },
     {
       "fieldName": "priority",
-      "fieldType": "String"
+      "fieldType": "Priority",
+      "fieldValues": "LOW,MEDIUM,HIGH"
     },
     {
       "fieldName": "status",
-      "fieldType": "String"
+      "fieldType": "Status",
+      "fieldValues": "PENDING,IN_PROGRESS,COMPLETED"
     },
     {
       "fieldName": "category",
@@ -37,6 +39,11 @@
     {
       "fieldName": "updatedAt",
       "fieldType": "Instant"
+    },
+    {
+      "fieldName": "privilege",
+      "fieldType": "Privilege",
+      "fieldValues": "VIEW,EDIT"
     }
   ],
   "name": "Task",
@@ -48,6 +55,14 @@
       "relationshipName": "workspace",
       "relationshipSide": "left",
       "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "user",
+      "relationshipName": "user",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-many",
+      "relationshipWithBuiltInEntity": true
     }
   ],
   "service": "serviceClass"

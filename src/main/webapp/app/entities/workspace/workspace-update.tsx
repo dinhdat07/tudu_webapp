@@ -5,8 +5,11 @@ import { Translate, ValidatedField, ValidatedForm, translate } from 'react-jhips
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
+import { mapIdList } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
+import { getUsers } from 'app/modules/administration/user-management/user-management.reducer';
+import { Privilege } from 'app/shared/model/enumerations/privilege.model';
 import { createEntity, getEntity, reset, updateEntity } from './workspace.reducer';
 
 export const WorkspaceUpdate = () => {
@@ -17,10 +20,12 @@ export const WorkspaceUpdate = () => {
   const { id } = useParams<'id'>();
   const isNew = id === undefined;
 
+  const users = useAppSelector(state => state.userManagement.users);
   const workspaceEntity = useAppSelector(state => state.workspace.entity);
   const loading = useAppSelector(state => state.workspace.loading);
   const updating = useAppSelector(state => state.workspace.updating);
   const updateSuccess = useAppSelector(state => state.workspace.updateSuccess);
+  const privilegeValues = Object.keys(Privilege);
 
   const handleClose = () => {
     navigate(`/workspace${location.search}`);
@@ -32,6 +37,8 @@ export const WorkspaceUpdate = () => {
     } else {
       dispatch(getEntity(id));
     }
+
+    dispatch(getUsers({}));
   }, []);
 
   useEffect(() => {
@@ -50,6 +57,7 @@ export const WorkspaceUpdate = () => {
     const entity = {
       ...workspaceEntity,
       ...values,
+      users: mapIdList(values.users),
     };
 
     if (isNew) {
@@ -66,9 +74,11 @@ export const WorkspaceUpdate = () => {
           updatedAt: displayDefaultDateTime(),
         }
       : {
+          privilege: 'VIEW',
           ...workspaceEntity,
           createdAt: convertDateTimeFromServer(workspaceEntity.createdAt),
           updatedAt: convertDateTimeFromServer(workspaceEntity.updatedAt),
+          users: workspaceEntity?.users?.map(e => e.id.toString()),
         };
 
   return (
@@ -129,6 +139,36 @@ export const WorkspaceUpdate = () => {
                 type="datetime-local"
                 placeholder="YYYY-MM-DD HH:mm"
               />
+              <ValidatedField
+                label={translate('tuduApp.workspace.privilege')}
+                id="workspace-privilege"
+                name="privilege"
+                data-cy="privilege"
+                type="select"
+              >
+                {privilegeValues.map(privilege => (
+                  <option value={privilege} key={privilege}>
+                    {translate(`tuduApp.Privilege.${privilege}`)}
+                  </option>
+                ))}
+              </ValidatedField>
+              <ValidatedField
+                label={translate('tuduApp.workspace.user')}
+                id="workspace-user"
+                data-cy="user"
+                type="select"
+                multiple
+                name="users"
+              >
+                <option value="" key="0" />
+                {users
+                  ? users.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
               <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/workspace" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;

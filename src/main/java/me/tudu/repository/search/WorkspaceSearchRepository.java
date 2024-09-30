@@ -57,7 +57,7 @@ class WorkspaceSearchRepositoryInternalImpl implements WorkspaceSearchRepository
 
     @Override
     public void index(Workspace entity) {
-        repository.findById(entity.getId()).ifPresent(elasticsearchTemplate::save);
+        repository.findOneWithEagerRelationships(entity.getId()).ifPresent(elasticsearchTemplate::save);
     }
 
     @Override

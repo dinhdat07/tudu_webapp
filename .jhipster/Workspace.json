@@ -21,10 +21,24 @@
     {
       "fieldName": "updatedAt",
       "fieldType": "Instant"
+    },
+    {
+      "fieldName": "privilege",
+      "fieldType": "Privilege",
+      "fieldValues": "VIEW,EDIT"
     }
   ],
   "name": "Workspace",
   "pagination": "pagination",
-  "relationships": [],
+  "relationships": [
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "user",
+      "relationshipName": "user",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-many",
+      "relationshipWithBuiltInEntity": true
+    }
+  ],
   "service": "serviceClass"
 }

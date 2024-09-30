@@ -192,6 +192,10 @@ export const Workspace = () => {
                   <Translate contentKey="tuduApp.workspace.updatedAt">Updated At</Translate>{' '}
                   <FontAwesomeIcon icon={getSortIconByFieldName('updatedAt')} />
                 </th>
+                <th className="hand" onClick={sort('privilege')}>
+                  <Translate contentKey="tuduApp.workspace.privilege">Privilege</Translate>{' '}
+                  <FontAwesomeIcon icon={getSortIconByFieldName('privilege')} />
+                </th>
                 <th />
               </tr>
             </thead>
@@ -207,6 +211,9 @@ export const Workspace = () => {
                   <td>{workspace.description}</td>
                   <td>{workspace.createdAt ? <TextFormat type="date" value={workspace.createdAt} format={APP_DATE_FORMAT} /> : null}</td>
                   <td>{workspace.updatedAt ? <TextFormat type="date" value={workspace.updatedAt} format={APP_DATE_FORMAT} /> : null}</td>
+                  <td>
+                    <Translate contentKey={`tuduApp.Privilege.${workspace.privilege}`} />
+                  </td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
                       <Button tag={Link} to={`/workspace/${workspace.id}`} color="info" size="sm" data-cy="entityDetailsButton">

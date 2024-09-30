@@ -8,6 +8,7 @@ import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateT
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { getUsers } from 'app/modules/administration/user-management/user-management.reducer';
+import { Status } from 'app/shared/model/enumerations/status.model';
 import { createEntity, getEntity, reset, updateEntity } from './notification.reducer';
 
 export const NotificationUpdate = () => {
@@ -23,6 +24,7 @@ export const NotificationUpdate = () => {
   const loading = useAppSelector(state => state.notification.loading);
   const updating = useAppSelector(state => state.notification.updating);
   const updateSuccess = useAppSelector(state => state.notification.updateSuccess);
+  const statusValues = Object.keys(Status);
 
   const handleClose = () => {
     navigate(`/notification${location.search}`);
@@ -69,6 +71,7 @@ export const NotificationUpdate = () => {
           createdAt: displayDefaultDateTime(),
         }
       : {
+          status: 'PENDING',
           ...notificationEntity,
           createdAt: convertDateTimeFromServer(notificationEntity.createdAt),
           user: notificationEntity?.user?.id,
@@ -114,8 +117,14 @@ export const NotificationUpdate = () => {
                 id="notification-status"
                 name="status"
                 data-cy="status"
-                type="text"
-              />
+                type="select"
+              >
+                {statusValues.map(status => (
+                  <option value={status} key={status}>
+                    {translate(`tuduApp.Status.${status}`)}
+                  </option>
+                ))}
+              </ValidatedField>
               <ValidatedField
                 label={translate('tuduApp.notification.createdAt')}
                 id="notification-createdAt"

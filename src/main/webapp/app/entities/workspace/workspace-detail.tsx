@@ -60,6 +60,25 @@ export const WorkspaceDetail = () => {
           <dd>
             {workspaceEntity.updatedAt ? <TextFormat value={workspaceEntity.updatedAt} type="date" format={APP_DATE_FORMAT} /> : null}
           </dd>
+          <dt>
+            <span id="privilege">
+              <Translate contentKey="tuduApp.workspace.privilege">Privilege</Translate>
+            </span>
+          </dt>
+          <dd>{workspaceEntity.privilege}</dd>
+          <dt>
+            <Translate contentKey="tuduApp.workspace.user">User</Translate>
+          </dt>
+          <dd>
+            {workspaceEntity.users
+              ? workspaceEntity.users.map((val, i) => (
+                  <span key={val.id}>
+                    <a>{val.id}</a>
+                    {workspaceEntity.users && i === workspaceEntity.users.length - 1 ? '' : ', '}
+                  </span>
+                ))
+              : null}
+          </dd>
         </dl>
         <Button tag={Link} to="/workspace" replace color="info" data-cy="entityDetailsBackButton">
           <FontAwesomeIcon icon="arrow-left" />{' '}

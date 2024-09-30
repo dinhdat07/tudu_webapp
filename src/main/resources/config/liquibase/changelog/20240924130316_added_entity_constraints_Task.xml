@@ -16,5 +16,19 @@
                                  referencedColumnNames="id"
                                  referencedTableName="workspace"
                                  />
+
+        <addForeignKeyConstraint baseColumnNames="task_id"
+                                 baseTableName="rel_task__user"
+                                 constraintName="fk_rel_task__user__task_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="task"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="user_id"
+                                 baseTableName="rel_task__user"
+                                 constraintName="fk_rel_task__user__user_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="jhi_user"
+                                 />
     </changeSet>
 </databaseChangeLog>

@@ -22,7 +22,9 @@
       "name": "Name",
       "description": "Description",
       "createdAt": "Created At",
-      "updatedAt": "Updated At"
+      "updatedAt": "Updated At",
+      "privilege": "Privilege",
+      "user": "User"
     }
   }
 }

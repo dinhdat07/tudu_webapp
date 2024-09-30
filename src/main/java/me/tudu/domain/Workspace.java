@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
+import me.tudu.domain.enumeration.Privilege;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -39,6 +42,20 @@ public class Workspace implements Serializable {
 
     @Column(name = "updated_at")
     private Instant updatedAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "privilege")
+    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Keyword)
+    private Privilege privilege;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "rel_workspace__user",
+        joinColumns = @JoinColumn(name = "workspace_id"),
+        inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    private Set<User> users = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -107,6 +124,42 @@ public class Workspace implements Serializable {
         this.updatedAt = updatedAt;
     }
 
+    public Privilege getPrivilege() {
+        return this.privilege;
+    }
+
+    public Workspace privilege(Privilege privilege) {
+        this.setPrivilege(privilege);
+        return this;
+    }
+
+    public void setPrivilege(Privilege privilege) {
+        this.privilege = privilege;
+    }
+
+    public Set<User> getUsers() {
+        return this.users;
+    }
+
+    public void setUsers(Set<User> users) {
+        this.users = users;
+    }
+
+    public Workspace users(Set<User> users) {
+        this.setUsers(users);
+        return this;
+    }
+
+    public Workspace addUser(User user) {
+        this.users.add(user);
+        return this;
+    }
+
+    public Workspace removeUser(User user) {
+        this.users.remove(user);
+        return this;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -135,6 +188,7 @@ public class Workspace implements Serializable {
             ", description='" + getDescription() + "'" +
             ", createdAt='" + getCreatedAt() + "'" +
             ", updatedAt='" + getUpdatedAt() + "'" +
+            ", privilege='" + getPrivilege() + "'" +
             "}";
     }
 }

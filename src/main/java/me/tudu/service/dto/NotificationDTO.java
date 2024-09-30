@@ -4,6 +4,7 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
+import me.tudu.domain.enumeration.Status;
 
 /**
  * A DTO for the {@link me.tudu.domain.Notification} entity.
@@ -16,7 +17,7 @@ public class NotificationDTO implements Serializable {
     @NotNull
     private String message;
 
-    private String status;
+    private Status status;
 
     private Instant createdAt;
 
@@ -38,11 +39,11 @@ public class NotificationDTO implements Serializable {
         this.message = message;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 

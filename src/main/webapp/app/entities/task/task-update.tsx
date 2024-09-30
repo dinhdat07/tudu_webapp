@@ -5,9 +5,14 @@ import { Translate, ValidatedField, ValidatedForm, translate } from 'react-jhips
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
+import { mapIdList } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { getEntities as getWorkspaces } from 'app/entities/workspace/workspace.reducer';
+import { getUsers } from 'app/modules/administration/user-management/user-management.reducer';
+import { Priority } from 'app/shared/model/enumerations/priority.model';
+import { Status } from 'app/shared/model/enumerations/status.model';
+import { Privilege } from 'app/shared/model/enumerations/privilege.model';
 import { createEntity, getEntity, reset, updateEntity } from './task.reducer';
 
 export const TaskUpdate = () => {
@@ -19,10 +24,14 @@ export const TaskUpdate = () => {
   const isNew = id === undefined;
 
   const workspaces = useAppSelector(state => state.workspace.entities);
+  const users = useAppSelector(state => state.userManagement.users);
   const taskEntity = useAppSelector(state => state.task.entity);
   const loading = useAppSelector(state => state.task.loading);
   const updating = useAppSelector(state => state.task.updating);
   const updateSuccess = useAppSelector(state => state.task.updateSuccess);
+  const priorityValues = Object.keys(Priority);
+  const statusValues = Object.keys(Status);
+  const privilegeValues = Object.keys(Privilege);
 
   const handleClose = () => {
     navigate(`/task${location.search}`);
@@ -36,6 +45,7 @@ export const TaskUpdate = () => {
     }
 
     dispatch(getWorkspaces({}));
+    dispatch(getUsers({}));
   }, []);
 
   useEffect(() => {
@@ -56,6 +66,7 @@ export const TaskUpdate = () => {
       ...taskEntity,
       ...values,
       workspace: workspaces.find(it => it.id.toString() === values.workspace?.toString()),
+      users: mapIdList(values.users),
     };
 
     if (isNew) {
@@ -73,11 +84,15 @@ export const TaskUpdate = () => {
           updatedAt: displayDefaultDateTime(),
         }
       : {
+          priority: 'LOW',
+          status: 'PENDING',
+          privilege: 'VIEW',
           ...taskEntity,
           dueDate: convertDateTimeFromServer(taskEntity.dueDate),
           createdAt: convertDateTimeFromServer(taskEntity.createdAt),
           updatedAt: convertDateTimeFromServer(taskEntity.updatedAt),
           workspace: taskEntity?.workspace?.id,
+          users: taskEntity?.users?.map(e => e.id.toString()),
         };
 
   return (
@@ -135,9 +150,21 @@ export const TaskUpdate = () => {
                 id="task-priority"
                 name="priority"
                 data-cy="priority"
-                type="text"
-              />
-              <ValidatedField label={translate('tuduApp.task.status')} id="task-status" name="status" data-cy="status" type="text" />
+                type="select"
+              >
+                {priorityValues.map(priority => (
+                  <option value={priority} key={priority}>
+                    {translate(`tuduApp.Priority.${priority}`)}
+                  </option>
+                ))}
+              </ValidatedField>
+              <ValidatedField label={translate('tuduApp.task.status')} id="task-status" name="status" data-cy="status" type="select">
+                {statusValues.map(status => (
+                  <option value={status} key={status}>
+                    {translate(`tuduApp.Status.${status}`)}
+                  </option>
+                ))}
+              </ValidatedField>
               <ValidatedField
                 label={translate('tuduApp.task.category')}
                 id="task-category"
@@ -162,6 +189,19 @@ export const TaskUpdate = () => {
                 placeholder="YYYY-MM-DD HH:mm"
               />
               <ValidatedField
+                label={translate('tuduApp.task.privilege')}
+                id="task-privilege"
+                name="privilege"
+                data-cy="privilege"
+                type="select"
+              >
+                {privilegeValues.map(privilege => (
+                  <option value={privilege} key={privilege}>
+                    {translate(`tuduApp.Privilege.${privilege}`)}
+                  </option>
+                ))}
+              </ValidatedField>
+              <ValidatedField
                 id="task-workspace"
                 name="workspace"
                 data-cy="workspace"
@@ -171,6 +211,16 @@ export const TaskUpdate = () => {
                 <option value="" key="0" />
                 {workspaces
                   ? workspaces.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <ValidatedField label={translate('tuduApp.task.user')} id="task-user" data-cy="user" type="select" multiple name="users">
+                <option value="" key="0" />
+                {users
+                  ? users.map(otherEntity => (
                       <option value={otherEntity.id} key={otherEntity.id}>
                         {otherEntity.id}
                       </option>

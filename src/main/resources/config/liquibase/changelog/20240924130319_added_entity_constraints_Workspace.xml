@@ -6,22 +6,22 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
                         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
     <!--
-        Added the constraints for entity UserWorkspaces.
+        Added the constraints for entity Workspace.
     -->
-    <changeSet id="20240924130318-2" author="jhipster">
-
-        <addForeignKeyConstraint baseColumnNames="user_id"
-                                 baseTableName="user_workspaces"
-                                 constraintName="fk_user_workspaces__user_id"
-                                 referencedColumnNames="id"
-                                 referencedTableName="jhi_user"
-                                 />
+    <changeSet id="20240924130319-2" author="jhipster">
 
         <addForeignKeyConstraint baseColumnNames="workspace_id"
-                                 baseTableName="user_workspaces"
-                                 constraintName="fk_user_workspaces__workspace_id"
+                                 baseTableName="rel_workspace__user"
+                                 constraintName="fk_rel_workspace__user__workspace_id"
                                  referencedColumnNames="id"
                                  referencedTableName="workspace"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="user_id"
+                                 baseTableName="rel_workspace__user"
+                                 constraintName="fk_rel_workspace__user__user_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="jhi_user"
                                  />
     </changeSet>
 </databaseChangeLog>

@@ -13,22 +13,33 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import me.tudu.IntegrationTest;
 import me.tudu.domain.Task;
+import me.tudu.domain.enumeration.Priority;
+import me.tudu.domain.enumeration.Privilege;
+import me.tudu.domain.enumeration.Status;
 import me.tudu.repository.TaskRepository;
+import me.tudu.repository.UserRepository;
 import me.tudu.repository.search.TaskSearchRepository;
+import me.tudu.service.TaskService;
 import me.tudu.service.dto.TaskDTO;
 import me.tudu.service.mapper.TaskMapper;
 import org.assertj.core.util.IterableUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Streamable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -39,6 +50,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Integration tests for the {@link TaskResource} REST controller.
  */
 @IntegrationTest
+@ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 @WithMockUser
 class TaskResourceIT {
@@ -52,11 +64,11 @@ class TaskResourceIT {
     private static final Instant DEFAULT_DUE_DATE = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_DUE_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
-    private static final String DEFAULT_PRIORITY = "AAAAAAAAAA";
-    private static final String UPDATED_PRIORITY = "BBBBBBBBBB";
+    private static final Priority DEFAULT_PRIORITY = Priority.LOW;
+    private static final Priority UPDATED_PRIORITY = Priority.MEDIUM;
 
-    private static final String DEFAULT_STATUS = "AAAAAAAAAA";
-    private static final String UPDATED_STATUS = "BBBBBBBBBB";
+    private static final Status DEFAULT_STATUS = Status.PENDING;
+    private static final Status UPDATED_STATUS = Status.IN_PROGRESS;
 
     private static final String DEFAULT_CATEGORY = "AAAAAAAAAA";
     private static final String UPDATED_CATEGORY = "BBBBBBBBBB";
@@ -66,6 +78,9 @@ class TaskResourceIT {
 
     private static final Instant DEFAULT_UPDATED_AT = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_UPDATED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+
+    private static final Privilege DEFAULT_PRIVILEGE = Privilege.VIEW;
+    private static final Privilege UPDATED_PRIVILEGE = Privilege.EDIT;
 
     private static final String ENTITY_API_URL = "/api/tasks";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -81,7 +96,16 @@ class TaskResourceIT {
     private TaskRepository taskRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Mock
+    private TaskRepository taskRepositoryMock;
+
+    @Autowired
     private TaskMapper taskMapper;
+
+    @Mock
+    private TaskService taskServiceMock;
 
     @Autowired
     private TaskSearchRepository taskSearchRepository;
@@ -111,7 +135,8 @@ class TaskResourceIT {
             .status(DEFAULT_STATUS)
             .category(DEFAULT_CATEGORY)
             .createdAt(DEFAULT_CREATED_AT)
-            .updatedAt(DEFAULT_UPDATED_AT);
+            .updatedAt(DEFAULT_UPDATED_AT)
+            .privilege(DEFAULT_PRIVILEGE);
     }
 
     /**
@@ -129,7 +154,8 @@ class TaskResourceIT {
             .status(UPDATED_STATUS)
             .category(UPDATED_CATEGORY)
             .createdAt(UPDATED_CREATED_AT)
-            .updatedAt(UPDATED_UPDATED_AT);
+            .updatedAt(UPDATED_UPDATED_AT)
+            .privilege(UPDATED_PRIVILEGE);
     }
 
     @BeforeEach
@@ -235,11 +261,29 @@ class TaskResourceIT {
             .andExpect(jsonPath("$.[*].title").value(hasItem(DEFAULT_TITLE)))
             .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
             .andExpect(jsonPath("$.[*].dueDate").value(hasItem(DEFAULT_DUE_DATE.toString())))
-            .andExpect(jsonPath("$.[*].priority").value(hasItem(DEFAULT_PRIORITY)))
-            .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS)))
+            .andExpect(jsonPath("$.[*].priority").value(hasItem(DEFAULT_PRIORITY.toString())))
+            .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS.toString())))
             .andExpect(jsonPath("$.[*].category").value(hasItem(DEFAULT_CATEGORY)))
             .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
-            .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())));
+            .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].privilege").value(hasItem(DEFAULT_PRIVILEGE.toString())));
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    void getAllTasksWithEagerRelationshipsIsEnabled() throws Exception {
+        when(taskServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
+
+        restTaskMockMvc.perform(get(ENTITY_API_URL + "?eagerload=true")).andExpect(status().isOk());
+
+        verify(taskServiceMock, times(1)).findAllWithEagerRelationships(any());
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    void getAllTasksWithEagerRelationshipsIsNotEnabled() throws Exception {
+        when(taskServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
+
+        restTaskMockMvc.perform(get(ENTITY_API_URL + "?eagerload=false")).andExpect(status().isOk());
+        verify(taskRepositoryMock, times(1)).findAll(any(Pageable.class));
     }
 
     @Test
@@ -257,11 +301,12 @@ class TaskResourceIT {
             .andExpect(jsonPath("$.title").value(DEFAULT_TITLE))
             .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION))
             .andExpect(jsonPath("$.dueDate").value(DEFAULT_DUE_DATE.toString()))
-            .andExpect(jsonPath("$.priority").value(DEFAULT_PRIORITY))
-            .andExpect(jsonPath("$.status").value(DEFAULT_STATUS))
+            .andExpect(jsonPath("$.priority").value(DEFAULT_PRIORITY.toString()))
+            .andExpect(jsonPath("$.status").value(DEFAULT_STATUS.toString()))
             .andExpect(jsonPath("$.category").value(DEFAULT_CATEGORY))
             .andExpect(jsonPath("$.createdAt").value(DEFAULT_CREATED_AT.toString()))
-            .andExpect(jsonPath("$.updatedAt").value(DEFAULT_UPDATED_AT.toString()));
+            .andExpect(jsonPath("$.updatedAt").value(DEFAULT_UPDATED_AT.toString()))
+            .andExpect(jsonPath("$.privilege").value(DEFAULT_PRIVILEGE.toString()));
     }
 
     @Test
@@ -293,7 +338,8 @@ class TaskResourceIT {
             .status(UPDATED_STATUS)
             .category(UPDATED_CATEGORY)
             .createdAt(UPDATED_CREATED_AT)
-            .updatedAt(UPDATED_UPDATED_AT);
+            .updatedAt(UPDATED_UPDATED_AT)
+            .privilege(UPDATED_PRIVILEGE);
         TaskDTO taskDTO = taskMapper.toDto(updatedTask);
 
         restTaskMockMvc
@@ -431,7 +477,8 @@ class TaskResourceIT {
             .status(UPDATED_STATUS)
             .category(UPDATED_CATEGORY)
             .createdAt(UPDATED_CREATED_AT)
-            .updatedAt(UPDATED_UPDATED_AT);
+            .updatedAt(UPDATED_UPDATED_AT)
+            .privilege(UPDATED_PRIVILEGE);
 
         restTaskMockMvc
             .perform(
@@ -555,11 +602,12 @@ class TaskResourceIT {
             .andExpect(jsonPath("$.[*].title").value(hasItem(DEFAULT_TITLE)))
             .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
             .andExpect(jsonPath("$.[*].dueDate").value(hasItem(DEFAULT_DUE_DATE.toString())))
-            .andExpect(jsonPath("$.[*].priority").value(hasItem(DEFAULT_PRIORITY)))
-            .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS)))
+            .andExpect(jsonPath("$.[*].priority").value(hasItem(DEFAULT_PRIORITY.toString())))
+            .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS.toString())))
             .andExpect(jsonPath("$.[*].category").value(hasItem(DEFAULT_CATEGORY)))
             .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
-            .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())));
+            .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].privilege").value(hasItem(DEFAULT_PRIVILEGE.toString())));
     }
 
     protected long getRepositoryCount() {

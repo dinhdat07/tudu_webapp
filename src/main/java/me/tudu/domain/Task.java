@@ -1,9 +1,15 @@
 package me.tudu.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
+import me.tudu.domain.enumeration.Priority;
+import me.tudu.domain.enumeration.Privilege;
+import me.tudu.domain.enumeration.Status;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -37,13 +43,15 @@ public class Task implements Serializable {
     @Column(name = "due_date")
     private Instant dueDate;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "priority")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
-    private String priority;
+    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Keyword)
+    private Priority priority;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
-    private String status;
+    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Keyword)
+    private Status status;
 
     @Column(name = "category")
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
@@ -55,8 +63,19 @@ public class Task implements Serializable {
     @Column(name = "updated_at")
     private Instant updatedAt;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "privilege")
+    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Keyword)
+    private Privilege privilege;
+
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "users" }, allowSetters = true)
     private Workspace workspace;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "rel_task__user", joinColumns = @JoinColumn(name = "task_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    private Set<User> users = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -112,29 +131,29 @@ public class Task implements Serializable {
         this.dueDate = dueDate;
     }
 
-    public String getPriority() {
+    public Priority getPriority() {
         return this.priority;
     }
 
-    public Task priority(String priority) {
+    public Task priority(Priority priority) {
         this.setPriority(priority);
         return this;
     }
 
-    public void setPriority(String priority) {
+    public void setPriority(Priority priority) {
         this.priority = priority;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return this.status;
     }
 
-    public Task status(String status) {
+    public Task status(Status status) {
         this.setStatus(status);
         return this;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
@@ -177,6 +196,19 @@ public class Task implements Serializable {
         this.updatedAt = updatedAt;
     }
 
+    public Privilege getPrivilege() {
+        return this.privilege;
+    }
+
+    public Task privilege(Privilege privilege) {
+        this.setPrivilege(privilege);
+        return this;
+    }
+
+    public void setPrivilege(Privilege privilege) {
+        this.privilege = privilege;
+    }
+
     public Workspace getWorkspace() {
         return this.workspace;
     }
@@ -187,6 +219,29 @@ public class Task implements Serializable {
 
     public Task workspace(Workspace workspace) {
         this.setWorkspace(workspace);
+        return this;
+    }
+
+    public Set<User> getUsers() {
+        return this.users;
+    }
+
+    public void setUsers(Set<User> users) {
+        this.users = users;
+    }
+
+    public Task users(Set<User> users) {
+        this.setUsers(users);
+        return this;
+    }
+
+    public Task addUser(User user) {
+        this.users.add(user);
+        return this;
+    }
+
+    public Task removeUser(User user) {
+        this.users.remove(user);
         return this;
     }
 
@@ -222,6 +277,7 @@ public class Task implements Serializable {
             ", category='" + getCategory() + "'" +
             ", createdAt='" + getCreatedAt() + "'" +
             ", updatedAt='" + getUpdatedAt() + "'" +
+            ", privilege='" + getPrivilege() + "'" +
             "}";
     }
 }

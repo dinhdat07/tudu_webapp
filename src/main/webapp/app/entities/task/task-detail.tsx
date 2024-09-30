@@ -81,9 +81,28 @@ export const TaskDetail = () => {
           </dt>
           <dd>{taskEntity.updatedAt ? <TextFormat value={taskEntity.updatedAt} type="date" format={APP_DATE_FORMAT} /> : null}</dd>
           <dt>
+            <span id="privilege">
+              <Translate contentKey="tuduApp.task.privilege">Privilege</Translate>
+            </span>
+          </dt>
+          <dd>{taskEntity.privilege}</dd>
+          <dt>
             <Translate contentKey="tuduApp.task.workspace">Workspace</Translate>
           </dt>
           <dd>{taskEntity.workspace ? taskEntity.workspace.id : ''}</dd>
+          <dt>
+            <Translate contentKey="tuduApp.task.user">User</Translate>
+          </dt>
+          <dd>
+            {taskEntity.users
+              ? taskEntity.users.map((val, i) => (
+                  <span key={val.id}>
+                    <a>{val.id}</a>
+                    {taskEntity.users && i === taskEntity.users.length - 1 ? '' : ', '}
+                  </span>
+                ))
+              : null}
+          </dd>
         </dl>
         <Button tag={Link} to="/task" replace color="info" data-cy="entityDetailsBackButton">
           <FontAwesomeIcon icon="arrow-left" />{' '}

@@ -3,7 +3,12 @@ package me.tudu.service.dto;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
+import me.tudu.domain.enumeration.Priority;
+import me.tudu.domain.enumeration.Privilege;
+import me.tudu.domain.enumeration.Status;
 
 /**
  * A DTO for the {@link me.tudu.domain.Task} entity.
@@ -20,9 +25,9 @@ public class TaskDTO implements Serializable {
 
     private Instant dueDate;
 
-    private String priority;
+    private Priority priority;
 
-    private String status;
+    private Status status;
 
     private String category;
 
@@ -30,7 +35,11 @@ public class TaskDTO implements Serializable {
 
     private Instant updatedAt;
 
+    private Privilege privilege;
+
     private WorkspaceDTO workspace;
+
+    private Set<UserDTO> users = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -64,19 +73,19 @@ public class TaskDTO implements Serializable {
         this.dueDate = dueDate;
     }
 
-    public String getPriority() {
+    public Priority getPriority() {
         return priority;
     }
 
-    public void setPriority(String priority) {
+    public void setPriority(Priority priority) {
         this.priority = priority;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
@@ -104,12 +113,28 @@ public class TaskDTO implements Serializable {
         this.updatedAt = updatedAt;
     }
 
+    public Privilege getPrivilege() {
+        return privilege;
+    }
+
+    public void setPrivilege(Privilege privilege) {
+        this.privilege = privilege;
+    }
+
     public WorkspaceDTO getWorkspace() {
         return workspace;
     }
 
     public void setWorkspace(WorkspaceDTO workspace) {
         this.workspace = workspace;
+    }
+
+    public Set<UserDTO> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Set<UserDTO> users) {
+        this.users = users;
     }
 
     @Override
@@ -146,7 +171,9 @@ public class TaskDTO implements Serializable {
             ", category='" + getCategory() + "'" +
             ", createdAt='" + getCreatedAt() + "'" +
             ", updatedAt='" + getUpdatedAt() + "'" +
+            ", privilege='" + getPrivilege() + "'" +
             ", workspace=" + getWorkspace() +
+            ", users=" + getUsers() +
             "}";
     }
 }

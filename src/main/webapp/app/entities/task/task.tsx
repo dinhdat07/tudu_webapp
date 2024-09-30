@@ -207,6 +207,10 @@ export const Task = () => {
                   <Translate contentKey="tuduApp.task.updatedAt">Updated At</Translate>{' '}
                   <FontAwesomeIcon icon={getSortIconByFieldName('updatedAt')} />
                 </th>
+                <th className="hand" onClick={sort('privilege')}>
+                  <Translate contentKey="tuduApp.task.privilege">Privilege</Translate>{' '}
+                  <FontAwesomeIcon icon={getSortIconByFieldName('privilege')} />
+                </th>
                 <th>
                   <Translate contentKey="tuduApp.task.workspace">Workspace</Translate> <FontAwesomeIcon icon="sort" />
                 </th>
@@ -224,11 +228,18 @@ export const Task = () => {
                   <td>{task.title}</td>
                   <td>{task.description}</td>
                   <td>{task.dueDate ? <TextFormat type="date" value={task.dueDate} format={APP_DATE_FORMAT} /> : null}</td>
-                  <td>{task.priority}</td>
-                  <td>{task.status}</td>
+                  <td>
+                    <Translate contentKey={`tuduApp.Priority.${task.priority}`} />
+                  </td>
+                  <td>
+                    <Translate contentKey={`tuduApp.Status.${task.status}`} />
+                  </td>
                   <td>{task.category}</td>
                   <td>{task.createdAt ? <TextFormat type="date" value={task.createdAt} format={APP_DATE_FORMAT} /> : null}</td>
                   <td>{task.updatedAt ? <TextFormat type="date" value={task.updatedAt} format={APP_DATE_FORMAT} /> : null}</td>
+                  <td>
+                    <Translate contentKey={`tuduApp.Privilege.${task.privilege}`} />
+                  </td>
                   <td>{task.workspace ? <Link to={`/workspace/${task.workspace.id}`}>{task.workspace.id}</Link> : ''}</td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">

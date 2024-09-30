@@ -204,7 +204,9 @@ export const Notification = () => {
                     </Button>
                   </td>
                   <td>{notification.message}</td>
-                  <td>{notification.status}</td>
+                  <td>
+                    <Translate contentKey={`tuduApp.Status.${notification.status}`} />
+                  </td>
                   <td>
                     {notification.createdAt ? <TextFormat type="date" value={notification.createdAt} format={APP_DATE_FORMAT} /> : null}
                   </td>
